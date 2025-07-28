@@ -1,0 +1,32 @@
+# IDE (PyCharm, VSCode и прочие щупальца)
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# Виртуальные окружения
+env/
+venv/
+.git-buddy-bot-py3.11/
+*.env
+*.venv
+
+# Poetry/Virtualenv
+poetry.lock
+*.egg-info/
+
+# Секреты (если решишь хранить токен в отдельном файле)
+config.py
+*.env
+
+# Jupyter но вдруг
+.ipynb_checkpoints/
+
+# Системный мусор
+.DS_Store
+Thumbs.db
