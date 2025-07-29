@@ -20,3 +20,15 @@ COMMANDS = {
         "command": "git commit -m \"сообщение\""
     }
 }
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton(COMMANDS[key]["title"], callback_data=key)]
+        for key in COMMANDS
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        "Привет! Я GitBuddyBot. Нажми на команду, чтобы узнать о ней больше:",
+        reply_markup=reply_markup
+    )
