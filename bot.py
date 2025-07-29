@@ -1,11 +1,13 @@
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-    MessageHandler,
+    MessageHandler,   # вот он
     ContextTypes,
-    filters
+    filters            # и он
 )
+
 
 from config import TOKEN
 
@@ -29,11 +31,11 @@ COMMANDS = {
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """
-        Отправляет стартовое сообщение с кнопками выбора Git-команд.
+    """
+    Отправляет стартовое сообщение с кнопками выбора Git-команд.
 
-        Пользователь получает приветствие и клавиатуру с доступными Git-командами.
-        """
+    Пользователь получает приветствие и клавиатуру с доступными Git-командами.
+    """
     keyboard = [
         [InlineKeyboardButton(COMMANDS[key]["title"], callback_data=key)]
         for key in COMMANDS
