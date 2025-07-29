@@ -30,11 +30,10 @@ COMMANDS = {
 }
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def show_main_menu(update, context, edit=False):
     """
-    Отправляет стартовое сообщение с кнопками выбора Git-команд.
-
-    Пользователь получает приветствие и клавиатуру с доступными Git-командами.
+    Показывает главное меню с кнопками команд.
+    Может быть вызвано при старте или при нажатии 'Назад'.
     """
     keyboard = [
         [InlineKeyboardButton(COMMANDS[key]["title"], callback_data=key)]
@@ -42,10 +41,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text(
-        "Привет! Я GitBuddyBot. Нажми на команду, чтобы узнать о ней больше:",
-        reply_markup=reply_markup,
-    )
+    text = "Выбери команду Git:"
+
+    if edit:
+        await update.callback_query.edit_message_text(text=text, reply_markup=reply_markup)
+    else:
+        await update.message.reply_text(text=text, reply_markup=reply_markup)
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обрабатывает команду /start. Показывает приветствие и вызывает главное меню.
+    """
+    await update.message.reply_text("Привет! Я GitBuddyBot.")
+    await show_main_menu(update, context)
 
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,16 +79,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text=message, parse_mode="Markdown", reply_markup=reply_markup)
 
     elif key == "back":
-        keyboard = [
-            [InlineKeyboardButton(COMMANDS[k]["title"], callback_data=k)]
-            for k in COMMANDS
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await query.edit_message_text(
-            text="Выбери команду Git:",
-            reply_markup=reply_markup
-        )
+        await show_main_menu(update, context, edit=True)
 
     else:
         await query.edit_message_text(text="Неизвестная команда 🤷‍♂️")
@@ -106,6 +107,4 @@ if __name__ == "__main__":
 
     print("🤖 Бот запущен. Нажмите Ctrl+C, чтобы остановить.")
     app.run_polling()
-
-
 
