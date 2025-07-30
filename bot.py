@@ -5,48 +5,22 @@ from telegram.ext import (
     CallbackQueryHandler,
     MessageHandler,
     ContextTypes,
-    filters
+    filters,
 )
 
 from config import TOKEN
-
-# Многоуровневое меню
-MENU_STRUCTURE = {
-    "init": {
-        "title": "Создание репозитория",
-        "explanation": "`git init` — создаёт новый пустой Git-репозиторий в текущей папке.",
-        "command": "git init"
-    },
-    "add": {
-        "title": "Добавление файлов",
-        "explanation": "`git add .` — добавляет все изменения в рабочей директории к следующему коммиту.",
-        "command": "git add ."
-    },
-    "commit": {
-        "title": "Коммит",
-        "submenu": {
-            "simple_commit": {
-                "title": "Простой коммит",
-                "explanation": '`git commit -m "сообщение"` — сохраняет текущие изменения с комментарием.',
-                "command": 'git commit -m "сообщение"'
-            },
-            "custom_commit": {
-                "title": "Сделать свой коммит",
-                "explanation": "Введите текст, и бот сформирует команду git commit",
-                "custom_input": True
-            }
-        }
-    }
-}
+from menu import MENU_STRUCTURE
 
 menu_stack = {}
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    menu_stack[update.effective_chat.id] = []
-    await show_menu(update, context, MENU_STRUCTURE)
     """
     Обрабатывает команду /start. Показывает приветствие и вызывает главное меню.
     """
+    menu_stack[update.effective_chat.id] = []
+    await show_menu(update, context, MENU_STRUCTURE)
+
 
 async def show_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, menu):
     """
@@ -54,19 +28,23 @@ async def show_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, menu):
     Может быть вызвано при старте или при нажатии 'Назад'.
     """
     keyboard = [
-        [InlineKeyboardButton(menu[key]["title"], callback_data=key)]
-        for key in menu
+        [InlineKeyboardButton(menu[key]["title"], callback_data=key)] for key in menu
     ]
     if menu_stack[update.effective_chat.id]:
         keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="__back")])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
-    message = "Выбери команду Git:" if update.callback_query else "Привет! Я GitBuddyBot."
+    message = (
+        "Выбери команду Git:" if update.callback_query else "Привет! Я GitBuddyBot."
+    )
 
     if update.callback_query:
-        await update.callback_query.edit_message_text(text=message, reply_markup=reply_markup)
+        await update.callback_query.edit_message_text(
+            text=message, reply_markup=reply_markup
+        )
     else:
         await update.message.reply_text(text=message, reply_markup=reply_markup)
+
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -114,13 +92,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             menu_stack[user_id].append(key)  # <== ВОТ ЭТО — твой пропуск обратно
 
             message = f"🔹 *{item['title']}*\n\n{item['explanation']}\n\n```\n{item['command']}\n```"
-            reply_markup = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔙 Назад", callback_data="__back")]
-            ])
+            reply_markup = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("🔙 Назад", callback_data="__back")]]
+            )
             await query.edit_message_text(
-                text=message,
-                parse_mode="Markdown",
-                reply_markup=reply_markup
+                text=message, parse_mode="Markdown", reply_markup=reply_markup
             )
 
     else:
@@ -139,20 +115,19 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = f"Готово! Вот твоя команда:\n\n```bash\n{command}\n```"
         context.user_data["expecting_commit"] = False
 
-        reply_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔙 Назад", callback_data="__back")]
-        ])
+        reply_markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("🔙 Назад", callback_data="__back")]]
+        )
 
         await update.message.reply_text(
-            message,
-            parse_mode="Markdown",
-            reply_markup=reply_markup
+            message, parse_mode="Markdown", reply_markup=reply_markup
         )
 
     else:
         await update.message.reply_text(
             "Извини, я понимаю только команды через кнопки. Нажми /start, если запутался."
         )
+
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
@@ -161,4 +136,3 @@ if __name__ == "__main__":
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
     print("🤖 Бот запущен. Нажмите Ctrl+C, чтобы остановить.")
     app.run_polling()
-
