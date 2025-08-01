@@ -99,6 +99,17 @@ MENU_STRUCTURE = {
                 "command_suffix": '"',
                 "input_prompt": "Введи текст коммита:",
             },
+            "cleanup": {
+                "title": "🧼 Очистка кеша",
+                "submenu": {
+                    "remove_env": {
+                        "title": "Удалить из Git (например, .env)",
+                        "explanation": "`git rm --cached имя` — удаляет файл из индекса Git, но оставляет файл на месте.",
+                        "command": "git rm --cached имя"
+                    },
+                    # можно потом добавить и .DS_Store, .coverage и т.д.
+                },
+            },
         },
     },
     "branches": {
