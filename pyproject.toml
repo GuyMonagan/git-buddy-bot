@@ -4,10 +4,17 @@ version = "0.1.0"
 description = ""
 authors = ["GuyMonagan <werevalkury@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "gitbuddy", from = "src" }
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.11"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^6.2.1"
 
 [build-system]
 requires = ["poetry-core"]

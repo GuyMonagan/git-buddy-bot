@@ -21,7 +21,7 @@ poetry.lock
 *.egg-info/
 
 # Секреты (если решишь хранить токен в отдельном файле)
-config.py
+src/gitbuddy/config.py
 *.env
 
 # Jupyter но вдруг
@@ -30,3 +30,10 @@ config.py
 # Системный мусор
 .DS_Store
 Thumbs.db
+
+# Тесты
+bot_for_test.py
+tests/test_bot_for_test.py
+
+.coverage
+htmlcov/
