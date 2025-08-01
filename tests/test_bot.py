@@ -1,6 +1,13 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
-from gitbuddy.bot import start, show_menu, button_handler, message_handler, menu_stack, help_handler
+from gitbuddy.bot import (
+    start,
+    show_menu,
+    button_handler,
+    message_handler,
+    menu_stack,
+    help_handler,
+)
 from gitbuddy.menu import MENU_STRUCTURE
 from gitbuddy import bot as bot_module  # нужен доступ к menu_stack
 from telegram.error import TelegramError
@@ -93,7 +100,7 @@ async def test_message_handler_generates_commit():
     context.user_data = {
         "expecting_commit": True,
         "command_prefix": 'git commit -m "',
-        "command_suffix": '"'
+        "command_suffix": '"',
     }
 
     await message_handler(update, context)
@@ -170,12 +177,15 @@ async def test_custom_input_git_commit():
 
     update.message.reply_text.assert_called_once()
     args, kwargs = update.message.reply_text.call_args
-    assert 'git commit -m "фикс багов"' in args[0] or kwargs.get("text", "").startswith("git commit")
+    assert 'git commit -m "фикс багов"' in args[0] or kwargs.get("text", "").startswith(
+        "git commit"
+    )
 
 
 @pytest.mark.asyncio
 async def test_show_menu_handles_telegram_error_gracefully():
     from gitbuddy import bot as bot_module
+
     bot_module.menu_stack[999] = []
 
     update = MagicMock()
