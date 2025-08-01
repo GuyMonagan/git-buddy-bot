@@ -39,14 +39,15 @@ async def show_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, menu):
         "Выбери команду Git:"
         if update.callback_query
         else "Привет! Я GitBuddyBot.\n"
-             "Помогаю вспомнить команды Git.\n"
-             "Выбери, с чем тебе нужна помощь 👇"
+        "Помогаю вспомнить команды Git.\n"
+        "Выбери, с чем тебе нужна помощь 👇"
     )
 
     if update.callback_query:
-        await update.callback_query.edit_message_text(
-            text=message, reply_markup=reply_markup
-        )
+        query = update.callback_query
+        if query.message.text != message or query.message.reply_markup != reply_markup:
+            await query.edit_message_text(text=message, reply_markup=reply_markup)
+
     else:
         await update.message.reply_text(text=message, reply_markup=reply_markup)
 
@@ -91,11 +92,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif item.get("custom_input"):
             menu_stack[user_id].append(key)
             context.user_data["expecting_commit"] = True
-            context.user_data["command_prefix"] = item.get("command_prefix", 'git commit -m "')
+            context.user_data["command_prefix"] = item.get(
+                "command_prefix", 'git commit -m "'
+            )
             context.user_data["command_suffix"] = item.get("command_suffix", '"')
             prompt = item.get("input_prompt", "Введи сообщение:")
             await query.edit_message_text(prompt)
-
 
         elif item.get("handler"):
             handler_func = globals().get(item["handler"])
@@ -135,14 +137,12 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.pop("command_prefix", None)
         context.user_data.pop("command_suffix", None)
 
-        reply_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔙 Назад", callback_data="__back")]
-        ])
+        reply_markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("🔙 Назад", callback_data="__back")]]
+        )
 
         await update.message.reply_text(
-            message,
-            parse_mode="Markdown",
-            reply_markup=reply_markup
+            message, parse_mode="Markdown", reply_markup=reply_markup
         )
 
     else:
@@ -155,10 +155,10 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = """
 \u26a0\ufe0f *ВАЖНО*
 
-1. Команды, скопированные из Telegram, могут сразу исполняться в терминале. Будь осторожен.  
+1. Команды, скопированные из Telegram, могут сразу исполняться в терминале. Будь осторожен.
    Лучше сначала вставь в текстовый редактор.
 
-2. Git отслеживает файлы, даже если ты добавил их в `.gitignore`,  
+2. Git отслеживает файлы, даже если ты добавил их в `.gitignore`,
    если они уже были закоммичены ранее.
 
 3. Бот всё ещё развивается. Если что-то сломалось — нажми /start или покричи в подушку.
@@ -167,13 +167,11 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 Сделано с болью, потом и *ChatGPT Monday*.
 """
-    reply_markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data="__back")]
-    ])
+    reply_markup = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("🔙 Назад", callback_data="__back")]]
+    )
     await update.callback_query.edit_message_text(
-        message,
-        parse_mode="Markdown",
-        reply_markup=reply_markup
+        message, parse_mode="Markdown", reply_markup=reply_markup
     )
 
 
